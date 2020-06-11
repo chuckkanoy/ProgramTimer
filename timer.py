@@ -3,24 +3,21 @@ from time import sleep
 import threading
 import sys
 
-# global variables
-closing = ""
-
 # clear the output window
 def clear():
-    global closing
     i = 0
-
     while(True):
         i = i + 1
-        if(i % 3 == 0):
-            print('Working.')
-        elif(i % 3 == 1):
-            print('Working..')
+        if(i % 5 == 1):
+            print('Working|')
+        elif(i % 5 == 2):
+            print('Working/')
+        elif(i % 5 == 3):
+            print('Working-')
         else:
-            print('Working...')
+            print('Working\\')
+            i = 0
         sleep(.5)
-
         # for windows
         if name == 'nt':
             _ = system('cls')
@@ -28,26 +25,23 @@ def clear():
         else:
             _ = system('clear')
 
+# save progress to file
+def close_up():
+    print("Done for today, but tomorrow will be a new!")
+
 # time a program and submit it to a permanent log for later access
 def main():
-    global closing
     project = input("Hello! What project are you working on today?")
     # if project doesn't exist in database, prompt the creation of a new one or go back
     # if project does exist, access it's file and 
     print("Have fun working on " + project)
-
-    x = threading.Thread(target=clear(), args=(None,))
+    x = threading.Thread(target=clear, daemon=True)
     x.start()
-    print('um')
-    while closing != 'quit':
-        closing = input('why')
-        if closing == 'quit':
-            print("Works")
-            break
-        else:
-            print("Works")
-    x.join()
-    print("Done for today, but tomorrow will be a new!")
+
+    while True:
+        if input() == 'q':
+            close_up()
+            sys.exit()
 
 if __name__ == "__main__":
     main()
