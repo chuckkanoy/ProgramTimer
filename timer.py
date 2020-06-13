@@ -62,7 +62,7 @@ def main():
         if response.lower == 'n':
             print('Understandable, have a nice day')
             sys.exit()
-        storage.append(project + "," + str(time.timedelta(0, 0, 0)))
+        storage.append(project + "," + str(datetime.timedelta(0, 0, 0)))
 
     # if project does exist, access it's file and 
     
@@ -87,7 +87,8 @@ def main():
                 print(line.split(','))
                 # modify old value and write it to file
                 if line.split(',')[0] == project:
-                    line = project + "," + str(finishing_time + time.strptime(int(line.split(',')[1]), "%H:%M:%S").replace("\n","")) + "\n"
+                    print(time.strptime(line.split(',')[1], "%H:%M:%S") + time.strptime(finishing_time))
+                    # line = project + "," + str(finishing_time + time.strptime(line.split(',')[1], "%H:%M:%S").replace("\n","")) + "\n"
                 f.write(line)
             f.close()
             sys.exit()
