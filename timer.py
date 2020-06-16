@@ -7,6 +7,9 @@ import sys
 import datetime
 import random
 
+stop_timer = False
+currentSecs = 0
+
 # display animation running in the background
 def clear():
     i = 0
@@ -34,64 +37,86 @@ def getMessage():
     messages = ['Another day, another dollar.', 'Great work today! Come back tomorrow (or don\'t, I\'m just a program)', 'Proud of you :)']
     print(messages[random.randint(0, len(messages) - 1)])
 
+def secondsToString(seconds):
+    hours = int(seconds / (24*60))
+    min = int((seconds - (hours * 24 * 60)) / 60)
+    seconds = int((seconds - ((min * 60) + (hours * 24 * 60))))
+    return (str(hours) + ":" + str(min) + ":" + str(seconds))
+
+def stringToSeconds(string):
+    secHolder = string.split(":")
+    seconds = int(secHolder[0]) * 24 * 60 + int(secHolder[1]) * 60 + int(secHolder[2])
+    return seconds
+
+def runTimer():
+    global currentSecs
+
+    while True:
+            sleep(1)
+            currentSecs = currentSecs + 1
+            if stop_timer:
+                break
+
+
 # time a program and submit it to a permanent log for later access
 def main():
+    global stop_timer
+
     project = input("Hello! What project are you working on today?\n")
     flag = True
     storage = []
     index = 0
     count = 0
+    numSeconds = 0
 
     # if project doesn't exist in database, prompt the creation of a new one or go back
     f = open('records.txt', 'r')
     for line in f:
+        storage.append(line)
         # check to see if the size of the file is zero
         if os.path.getsize("records.txt") != 0:
-            storage.append(line)
-            print(line.split(',')[0])
             if line.split(',')[0] == project:
                 index = count
                 flag = False
-            count = count + 1
         else:
             flag = True
     
     # handle when no record is found
     if(flag):
-        response = input(project + 'not found, would you like to create it?(Y/N)\n')
-        if response.lower == 'n':
+        response = input(project + ' not found, would you like to create it?(Y/N)\n')
+
+        if response.lower() == 'n':
             print('Understandable, have a nice day')
             sys.exit()
-        storage.append(project + "," + str(datetime.timedelta(0, 0, 0)))
+        storage.append(project + ",0:0:0")
 
-    # if project does exist, access it's file and 
-    
-    print(str(datetime.timedelta(0,0,0)))
     # create thread for animation
     x = threading.Thread(target=clear, daemon=True)
     x.start()
-
-    # grab initial time
-    start_time = datetime.datetime.now()
+    y = threading.Thread(target=runTimer)
+    y.start()
 
     while True:
         if input() == 'q':
+            stop_timer = True
+            y.join()
             getMessage()
-            end_time = datetime.datetime.now()
-            finishing_time = end_time - start_time
-            print('Worked for: ' + str(finishing_time))
+            print('Worked for: ' + secondsToString(currentSecs))
+
             f = open("records.txt", "w")
 
             # write the new data to the file
             for line in storage:
-                print(line.split(','))
                 # modify old value and write it to file
                 if line.split(',')[0] == project:
-                    print(time.strptime(line.split(',')[1], "%H:%M:%S") + time.strptime(finishing_time))
-                    # line = project + "," + str(finishing_time + time.strptime(line.split(',')[1], "%H:%M:%S").replace("\n","")) + "\n"
+                    previousTime = stringToSeconds(line.split(',')[1])
+                    newTime = secondsToString(currentSecs + previousTime)
+                    line = project + "," + newTime + "\n"
                 f.write(line)
             f.close()
             sys.exit()
+        sleep(1)
+        numSeconds = numSeconds + 1
 
 if __name__ == "__main__":
     main()
