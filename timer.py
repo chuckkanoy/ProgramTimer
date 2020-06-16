@@ -7,6 +7,7 @@ import sys
 import datetime
 import random
 
+# global variables
 stop_timer = False
 currentSecs = 0
 
@@ -37,17 +38,20 @@ def getMessage():
     messages = ['Another day, another dollar.', 'Great work today! Come back tomorrow (or don\'t, I\'m just a program)', 'Proud of you :)']
     print(messages[random.randint(0, len(messages) - 1)])
 
+# convert seconds into string for writing to file
 def secondsToString(seconds):
     hours = int(seconds / (24*60))
     min = int((seconds - (hours * 24 * 60)) / 60)
     seconds = int((seconds - ((min * 60) + (hours * 24 * 60))))
     return (str(hours) + ":" + str(min) + ":" + str(seconds))
 
+# convert string to seconds
 def stringToSeconds(string):
     secHolder = string.split(":")
     seconds = int(secHolder[0]) * 24 * 60 + int(secHolder[1]) * 60 + int(secHolder[2])
     return seconds
 
+# run timer in background via threading
 def runTimer():
     global currentSecs
 
@@ -65,23 +69,19 @@ def main():
     project = input("Hello! What project are you working on today?\n")
     flag = True
     storage = []
-    index = 0
-    count = 0
-    numSeconds = 0
 
-    # if project doesn't exist in database, prompt the creation of a new one or go back
+    # open the file and check for records
     f = open('records.txt', 'r')
     for line in f:
         storage.append(line)
         # check to see if the size of the file is zero
         if os.path.getsize("records.txt") != 0:
             if line.split(',')[0] == project:
-                index = count
                 flag = False
         else:
             flag = True
     
-    # handle when no record is found
+   # if project doesn't exist in database, prompt the creation of a new one or go back
     if(flag):
         response = input(project + ' not found, would you like to create it?(Y/N)\n')
 
@@ -93,6 +93,7 @@ def main():
     # create thread for animation
     x = threading.Thread(target=clear, daemon=True)
     x.start()
+    # create thread for timer
     y = threading.Thread(target=runTimer)
     y.start()
 
@@ -115,8 +116,6 @@ def main():
                 f.write(line)
             f.close()
             sys.exit()
-        sleep(1)
-        numSeconds = numSeconds + 1
 
 if __name__ == "__main__":
     main()
