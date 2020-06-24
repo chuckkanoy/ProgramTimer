@@ -40,15 +40,15 @@ def getMessage():
 
 # convert seconds into string for writing to file
 def secondsToString(seconds):
-    hours = int(seconds / (24*60))
-    min = int((seconds - (hours * 24 * 60)) / 60)
-    seconds = int((seconds - ((min * 60) + (hours * 24 * 60))))
+    hours = int(seconds / (60*60))
+    min = int((seconds - (hours * 60 * 60)) / 60)
+    seconds = int((seconds - ((min * 60) + (hours * 60 * 60))))
     return (str(hours) + ":" + str(min) + ":" + str(seconds))
 
 # convert string to seconds
 def stringToSeconds(string):
     secHolder = string.split(":")
-    seconds = int(secHolder[0]) * 24 * 60 + int(secHolder[1]) * 60 + int(secHolder[2])
+    seconds = int(secHolder[0]) * 60 * 60 + int(secHolder[1]) * 60 + int(secHolder[2])
     return seconds
 
 # run timer in background via threading
