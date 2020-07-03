@@ -1,9 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from .models import Project
 
 # Create your views here.
 def index(request):
-    return HttpResponse("This gon' be a timer.")
+    project_list = Project.objects.all()
+    output = ', '.join([q.project_name_text + " " + q.time_text for q in project_list])
+    return HttpResponse(output)
 
 def detail(request, program_id):
     return HttpResponse("You're looking at program %s." % program_id)
