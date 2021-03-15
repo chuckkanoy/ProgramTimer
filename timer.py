@@ -6,6 +6,7 @@ import threading
 import sys
 import datetime
 import random
+import numpy
 
 # global variables
 stop_timer = False
@@ -61,25 +62,78 @@ def runTimer():
             if stop_timer:
                 break
 
+def convertRecords():
+    storage = []
+    lineNum = 0
+    f = open('records.txt', 'r')
+
+    if os.path.getsize('records.txt') != 0:
+        for line in f:
+            line = line.replace("\n", "")
+            storage.append(line.split(","))
+            lineNum+=1
+    
+    return storage
+
+def writeTable(listArr):
+    maxWidth = 0
+
+    for i in range(len(listArr)):
+        for j in range(len(listArr[i])):
+            maxWidth = numpy.maximum(maxWidth, len(listArr[i][j]))
+    
+    maxWidth = maxWidth + 4
+    
+    table = ""
+    for i in range(len(listArr)):
+        table += "+"
+        for j in range(len(listArr[i])):
+            table += ("-" * maxWidth) + "+"
+        table += "\n"
+
+        line = "|"  
+        for j in range(len(listArr[i])):
+            length = maxWidth - len(listArr[i][j])
+            line += listArr[i][j] + (" " * length) + "|"
+        line += "\n"
+        table += line
+    table += "+"
+    for j in range(len(listArr[len(listArr) - 1])):
+        table += ("-" * maxWidth) + "+"
+    table += "\n"
+
+    print(table)
+
 
 # time a program and submit it to a permanent log for later access
 def main():
     global stop_timer
 
+    # open the file and check for records
+    try:
+        f = open('records.txt', 'r')
+        data = convertRecords()
+        writeTable(data)
+    except(FileNotFoundError):
+        f = open('records.txt', 'x')
+        f.write("Title,Time(H:M:S)\n")
+
     project = input("Hello! What project are you working on today?\n")
     flag = True
     storage = []
 
-    # open the file and check for records
     f = open('records.txt', 'r')
+
+    lineCount = 0
     for line in f:
         storage.append(line)
         # check to see if the size of the file is zero
         if os.path.getsize("records.txt") != 0:
-            if line.split(',')[0] == project:
+            if line.split(',')[0] == project and lineCount != 0:
                 flag = False
         else:
             flag = True
+        lineCount += 1
     
    # if project doesn't exist in database, prompt the creation of a new one or go back
     if(flag):
